@@ -1,0 +1,40 @@
+#!/bin/bash
+
+log=stderr.log
+tempfile=/tmp/matrix_prod
+usage="Usage : $0 nbProd file_out"
+make="Please run \"make\" first."
+darwin="You cannot use this script on a Darwin system."
+if [ `uname -s` == "Darwin" ]; then
+  echo "$darwin"
+else
+  if [[ ! -x generator || ! -x product_v1 || ! -x product_fair ]]; then
+    echo "$make"
+  else
+    if [[ ! "$1" =~ ^[1-9][0-9]*$ || ! -n "$2" ]]; then
+      echo "$usage"
+    else
+      ./generator $1 $tempfile 2>> $log
+      if [ $? -eq 0 ]; then
+        echo "--- Product without affinities ---"
+        ./product_v1 $tempfile $2 2>> $log
+        if [ $? -eq 0 ]; then
+          echo "--- Product with affinities ---"
+          ./product_fair $tempfile $2 2>> $log
+          if [ $? -eq 0 ]; then
+            echo "Done."
+          else
+            echo "./product_fair exit with status $?"
+          fi
+        else
+          echo "./product exit with status $?"
+        fi
+      else
+        echo "./generator exit with status $?"
+      fi
+      if [ -e $tempfile ]; then
+        rm -f $tempfile
+      fi
+    fi
+  fi
+fi

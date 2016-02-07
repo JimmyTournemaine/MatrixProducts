@@ -1,0 +1,31 @@
+#!/bin/bash
+
+log=stderr.log
+tempfile=/tmp/matrix_prod
+usage="Usage : $0 nbProd file_out"
+make="Please run \"make\" first."
+
+if [[ ! -x generator || ! -x product_v1 ]]
+then
+  echo "$make"
+else
+  if [[ ! "$1" =~ ^[1-9][0-9]*$ || ! -n "$2" ]]
+  then
+    echo "$usage"
+  else
+    ./generator $1 $tempfile 2>> $log
+    if [ $? -eq 0 ]; then
+      ./product_v1 $tempfile $2 2>> $log
+      if [ $? -eq 0 ]; then
+        echo "Done."
+      else
+        echo "./product exit with status $?"
+      fi
+    else
+      echo "./generator exit with status $?"
+    fi
+    if [ -e $tempfile ]; then
+      rm -f $tempfile
+    fi
+  fi
+fi
