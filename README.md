@@ -6,4 +6,7 @@
 	
 ## Documentation
 
-Please open the doc/html/index.html file for more informations.
+This is a study project so I add my french report.
+It include detailed documentation and explanations of the code.
+
+I've also put the english documentation in the **doc/html** folder.
